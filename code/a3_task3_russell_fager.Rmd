@@ -1,0 +1,122 @@
+---
+title: "Santa Barbara Urchins"
+author: "Russell Fager"
+date: "10/22/2021"
+output: html_document
+---
+
+## Overview
+
+This code wrangles then visualizes data for red and purple urchins observed at 5 sites along the Santa Barbara coast.
+
+Data Citation: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
+
+
+### Setup
+
+Attach packages
+
+```{r setup, include=TRUE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(kableExtra)
+library(DT)
+library(lubridate)
+
+```
+### Read in the data
+
+read in the urchins.csv data
+
+```{r}
+urchins_data <- read_csv(here("data", "urchins.csv"))
+```
+### Clean names to lower snake case
+
+```{r}
+urchins_data_clean <- urchins_data %>%  clean_names()
+```
+
+## SECTION 1
+
+### Data Visualization
+
+Size comparisons of purple and red urchins
+
+```{r}
+ggplot(data = urchins_data_clean, aes(x = size, color = common_name)) +
+  geom_histogram(bins = 10)+
+  facet_wrap(~common_name)+
+  labs(x = "Urchin Size (cm)", 
+       y = "Count of Urchins",
+       title = "Size Distribution of Red and Purple Urchins (FAGER)")
+```
+
+*Figure 1. This chart shows the distribution of sizes of red and purple sea urchins (measured to the nearest 0.5 cm) along the Santa Barbara coast. Data from Reed, D. 2020.*
+
+### Descriptive Statistics Table
+
+Here is a summary table showing the mean, median, standard deviation, and sample size for purple and red urchins from the Reed, D. 2020 data recorded by Santa Barbara Coastal Long Term Ecological Research program divers.
+
+```{r}
+urchin_stats <- urchins_data_clean %>% 
+  group_by(common_name) %>% 
+  summarize(
+    n = n(),
+    mean = mean(size),
+    sd = sd(size),
+    median = median(size))
+```
+
+
+```{r, results='asis'}
+urchin_stats %>% 
+  kable(caption = "Summary Statistics of Red and Purple Urchins Size", digits = 2, col.names = c("species",
+                       "Sample Size",
+                       "Mean Size (cm)",
+                       "Standard Deviation (cm)",
+                       "Median Size (cm)")) %>% 
+  kable_styling(full_width = FALSE)
+    
+```
+### Summary
+
+*The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 41% larger than purple urchins.*
+
+## Section 2
+
+This section explores purple urchin counts by site and year
+
+```{r}
+purple_urchins <- urchins_data_clean %>% 
+  filter(common_name == "Purple Urchin") %>% 
+  mutate(date_new = ymd(date)) %>% 
+  mutate(year = year(date_new)) %>% 
+  mutate(site_full = case_when(
+    site == "NAPL" ~ "Naples Reef", 
+    site == "AQUE" ~"Arroyo Quemado Reef",
+    site == "CARP" ~ "Carpinteria Reef",
+    site == "MOHK" ~ "Mohawk Reef",
+    site == "IVEE" ~ "Isla Vista Reef"
+  ))
+
+```
+
+```{r}
+purple_urchins %>% 
+  group_by(site, year) %>% 
+  count(site)
+
+```
+```{r}
+ggplot(data = purple_urchins, aes(x = year, color = site)) +
+  geom_histogram()+
+  facet_wrap(~site_full)+
+  labs(x = "tbd", 
+       y = "tbd",
+       title = " (FAGER)")
+```
+
