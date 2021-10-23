@@ -108,13 +108,14 @@ purple_urchins <- urchins_data_clean %>%
 ```{r}
 purple_urchins %>% 
   group_by(site, year) %>% 
-  count(site)
+  count(site) %>% 
+  rename(urchin_count = n)
 
 ```
 ```{r}
-ggplot(data = purple_urchins, aes(x = year, color = site)) +
-  geom_histogram()+
-  facet_wrap(~site_full)+
+ggplot(data = purple_urchins, aes(x = year, y = urchin_count)) +
+  geom_col()+
+  facet_grid(~site_full)+
   labs(x = "tbd", 
        y = "tbd",
        title = " (FAGER)")
