@@ -38,6 +38,7 @@ urchins_data <- read_csv(here("data", "urchins.csv"))
 
 ```{r}
 urchins_data_clean <- urchins_data %>%  clean_names()
+ 
 ```
 
 ## SECTION 1
@@ -50,6 +51,7 @@ Size comparisons of purple and red urchins
 ggplot(data = urchins_data_clean, aes(x = size, color = common_name)) +
   geom_histogram(bins = 10)+
   facet_wrap(~common_name)+
+  xlim(0, 15)+
   labs(x = "Urchin Size (cm)", 
        y = "Count of Urchins",
        title = "Size Distribution of Red and Purple Urchins (FAGER)")
@@ -82,7 +84,7 @@ urchin_stats %>%
   kable_styling(full_width = FALSE)
     
 ```
-*Figure 2. The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 41% larger than purple urchins.*
+*Figure 2. The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 34% larger than purple urchins.*
 
 ## Section 2
 
@@ -91,7 +93,7 @@ This section explores purple urchin counts by site and year
 ```{r}
 purple_urchins <- urchins_data_clean %>% 
   filter(common_name == "Purple Urchin") %>% 
-  mutate(date_new = ymd(date)) %>% 
+  mutate(date_new = mdy(date)) %>% 
   mutate(year = year(date_new)) %>% 
   mutate(site_full = case_when(
     site == "NAPL" ~ "Naples Reef", 
@@ -99,13 +101,16 @@ purple_urchins <- urchins_data_clean %>%
     site == "CARP" ~ "Carpinteria Reef",
     site == "MOHK" ~ "Mohawk Reef",
     site == "IVEE" ~ "Isla Vista Reef"
+  
   ))
+
+purple_urchins
 ```
 
 store a table containing the total number of purple urchins observed by site and year.
 ```{r}
-purple_urchins <- purple_urchins  %>% 
-  group_by(site, year) %>% 
+purple_urchins_summary <- purple_urchins  %>% 
+  group_by(site_full, year) %>% 
   summarize(urchin_count = n())
   
 ```
@@ -113,9 +118,9 @@ purple_urchins <- purple_urchins  %>%
 ### Data Visualization
 
 ```{r}
-ggplot(data = purple_urchins, aes(x = year, y = urchin_count)) +
-  geom_col(aes(fill = site), width = 0.5)+
-  facet_wrap( ~ site) +
+ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
+  geom_col(aes(fill = site_full), width = 0.5)+
+  facet_wrap( ~ site_full) +
   theme_bw ()+
   labs(x = "Year", 
        y = "Urchin Count",
@@ -123,6 +128,6 @@ ggplot(data = purple_urchins, aes(x = year, y = urchin_count)) +
 ```
 *Figure 3. This chart shows the number of purple urchins recorded at each site per year.
 
-Since we are.....TBD
+The graphs show a decline in purple urchin populations across all sites from 2008 to 2020. Since the data is only a sample it does not necessarily reflect the trends of an entire population. We would need to take the confidence interval to understand if this sample is reflective of the population. For example, if we get a confidence interval of 95% then we can be more certain that this sample accurately reflects trend in the entire purple urchin population. 
 
 
