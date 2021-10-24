@@ -1,0 +1,45 @@
+---
+title: "a3_task4_russell_fager"
+author: "Russell Fager"
+date: "10/23/2021"
+output: html_document
+---
+
+```{r setup, include=TRUE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+
+```
+
+### Read in the data
+
+read in the urchins.csv data
+```{r}
+urchins_data <- read_csv(here("data", "urchins.csv"))
+```
+### Clean names to lower snake case
+
+```{r}
+urchins_data_clean <- urchins_data %>%  clean_names()
+```
+### Wrangle the urchins data to only include Naples Reef observations for purple urchins observed in 2010
+```{r}
+purple_urchins <- urchins_data_clean %>% 
+  filter(common_name == "Purple Urchin", site == "NAPL") %>% 
+  mutate(date_new = ymd(date)) %>% 
+  mutate(year = year(date_new)) %>% 
+  filter(year == "2010")
+
+purple_urchins
+```
+### Data Visualization 
+
+```{r}
+ggplot(data = purple_urchins, aes(x = year)) +
+  geom_histogram()
+  facet_wrap( ~ site)
+```
+

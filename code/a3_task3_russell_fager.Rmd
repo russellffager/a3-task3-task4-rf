@@ -82,9 +82,7 @@ urchin_stats %>%
   kable_styling(full_width = FALSE)
     
 ```
-### Summary
-
-*The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 41% larger than purple urchins.*
+*Figure 2. The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 41% larger than purple urchins.*
 
 ## Section 2
 
@@ -102,22 +100,29 @@ purple_urchins <- urchins_data_clean %>%
     site == "MOHK" ~ "Mohawk Reef",
     site == "IVEE" ~ "Isla Vista Reef"
   ))
-
 ```
 
+store a table containing the total number of purple urchins observed by site and year.
 ```{r}
-purple_urchins %>% 
+purple_urchins <- purple_urchins  %>% 
   group_by(site, year) %>% 
-  count(site) %>% 
-  rename(urchin_count = n)
-
+  summarize(urchin_count = n())
+  
 ```
+
+### Data Visualization
+
 ```{r}
 ggplot(data = purple_urchins, aes(x = year, y = urchin_count)) +
-  geom_col()+
-  facet_grid(~site_full)+
-  labs(x = "tbd", 
-       y = "tbd",
-       title = " (FAGER)")
+  geom_col(aes(fill = site), width = 0.5)+
+  facet_wrap( ~ site) +
+  theme_bw ()+
+  labs(x = "Year", 
+       y = "Urchin Count",
+       title = "Urchin Count by Site 2008-2009 (FAGER)")
 ```
+*Figure 3. This chart shows the number of purple urchins recorded at each site per year.
+
+Since we are.....TBD
+
 
