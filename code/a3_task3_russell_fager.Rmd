@@ -9,8 +9,7 @@ output: html_document
 
 This code wrangles then visualizes data for red and purple urchins observed at 5 sites along the Santa Barbara coast.
 
-Data Citation: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b. 
-
+Data Citation: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. <https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b>.
 
 ### Setup
 
@@ -27,6 +26,7 @@ library(DT)
 library(lubridate)
 
 ```
+
 ### Read in the data
 
 read in the urchins.csv data
@@ -34,7 +34,10 @@ read in the urchins.csv data
 ```{r}
 urchins_data <- read_csv(here("data", "urchins.csv"))
 ```
-### Clean names to lower snake case
+
+### Data Wrangling
+
+clean names to lower snake case
 
 ```{r}
 urchins_data_clean <- urchins_data %>%  clean_names()
@@ -70,23 +73,22 @@ urchin_stats <- urchins_data_clean %>%
     n = n(),
     mean = mean(size),
     sd = sd(size),
-    median = median(size))
-```
-
-
-```{r, results='asis'}
-urchin_stats %>% 
+    median = median(size))%>% 
   kable(caption = "Summary Statistics of Red and Purple Urchins Size", digits = 2, col.names = c("species",
                        "Sample Size",
                        "Mean Size (cm)",
                        "Standard Deviation (cm)",
                        "Median Size (cm)")) %>% 
   kable_styling(full_width = FALSE)
-    
+urchin_stats
+
 ```
+
 *Figure 2. The data shows that on average red urchins are larger then purple urchins. The red urchin data also has a normal distribution and more even spread, while the purple urchin data is more skewed and does not exhibit normal distribution around the mean. On average red urchins are 2.31 (cm), or 34% larger than purple urchins.*
 
 ## Section 2
+
+### Data Wrangling
 
 This section explores purple urchin counts by site and year
 
@@ -104,10 +106,10 @@ purple_urchins <- urchins_data_clean %>%
   
   ))
 
-purple_urchins
 ```
 
-store a table containing the total number of purple urchins observed by site and year.
+The code below stores a table containing the total number of purple urchins observed by site and year.
+
 ```{r}
 purple_urchins_summary <- purple_urchins  %>% 
   group_by(site_full, year) %>% 
@@ -117,6 +119,8 @@ purple_urchins_summary <- purple_urchins  %>%
 
 ### Data Visualization
 
+The code below creates a chart showing the number of purple urchins recorded at each site per year.
+
 ```{r}
 ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
   geom_col(aes(fill = site_full), width = 0.5)+
@@ -124,10 +128,11 @@ ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
   theme_bw ()+
   labs(x = "Year", 
        y = "Urchin Count",
-       title = "Urchin Count by Site 2008-2009 (FAGER)")
+       title = "Urchin Count by Site and Year (FAGER)")
 ```
-*Figure 3. This chart shows the number of purple urchins recorded at each site per year.
 
-The graphs show a decline in purple urchin populations across all sites from 2008 to 2020. Since the data is only a sample it does not necessarily reflect the trends of an entire population. We would need to take the confidence interval to understand if this sample is reflective of the population. For example, if we get a confidence interval of 95% then we can be more certain that this sample accurately reflects trend in the entire purple urchin population. 
+*Figure 3. This chart shows the number of purple urchins recorded at each site per year*
 
+The graphs show a decline in purple urchin populations across all sites from 2008 to 2020. Since the data is only a sample it does not necessarily reflect the trends of an entire population. We would need to take the confidence interval to understand if this sample is reflective of the population. For example, if we get a confidence interval of 95% then we can be more certain that this sample accurately reflects a declining trend in the entire purple urchin population.
 
+## End Task
