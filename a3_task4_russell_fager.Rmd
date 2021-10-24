@@ -29,7 +29,7 @@ urchins_data_clean <- urchins_data %>%  clean_names()
 ```{r}
 purple_urchins <- urchins_data_clean %>% 
   filter(common_name == "Purple Urchin", site == "NAPL") %>% 
-  mutate(date_new = ymd(date)) %>% 
+  mutate(date_new = mdy(date)) %>% 
   mutate(year = year(date_new)) %>% 
   filter(year == "2010")
 
@@ -38,8 +38,65 @@ purple_urchins
 ### Data Visualization 
 
 ```{r}
-ggplot(data = purple_urchins, aes(x = year)) +
-  geom_histogram()
-  facet_wrap( ~ site)
+ggplot(data = purple_urchins, aes(x = size, color = treatment)) +
+  geom_histogram() +
+  facet_wrap( ~ treatment)
+ 
+```
+```{r}
+qqnorm(purple_urchins$size)
+qqline(purple_urchins$size)
 ```
 
+```{r}
+purple_urchins_control <- urchins_data_clean %>% 
+  filter(common_name == "Purple Urchin", site == "NAPL", treatment == "CONTROL") %>% 
+  mutate(date_new = mdy(date)) %>% 
+  mutate(year = year(date_new)) %>% 
+  filter(year == "2010")
+```
+
+```{r}
+qqnorm(purple_urchins_control$size)
+qqline(purple_urchins_control$size)
+```
+
+```{r}
+purple_urchins_annual <- urchins_data_clean %>% 
+  filter(common_name == "Purple Urchin", site == "NAPL", treatment == "ANNUAL") %>% 
+  mutate(date_new = mdy(date)) %>% 
+  mutate(year = year(date_new)) %>% 
+  filter(year == "2010")
+
+purple_urchins_annual
+```
+
+```{r}
+qqnorm(purple_urchins_annual$size)
+qqline(purple_urchins_annual$size)
+```
+The data points are close to the line indicating that data has a close to normal distribution.
+
+## Create a finalized basic summary table (with table caption above) of descriptive statistics for both groups (including at least the mean, standard deviation, and sample size by treatment). 
+
+    
+```{r}
+purpl_urchin_stats <- purple_urchins %>% 
+  group_by(treatment) %>% 
+  summarize(
+    n = n(),
+    mean = mean(size),
+    sd = sd(size),
+    median = median(size)) %>% 
+
+kable(caption = "Summary Statistics of Purple Urchins Size by Treatment", digits = 2, col.names = c("species",
+                       "Sample Size",
+                       "Mean Size (cm)",
+                       "Standard Deviation (cm)",
+                       "Median Size (cm)")) %>% 
+  kable_styling(full_width = FALSE)
+
+purpl_urchin_stats
+
+```
+    
