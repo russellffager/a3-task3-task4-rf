@@ -1,9 +1,15 @@
 ---
-title: "a3_task4_russell_fager"
+title: "Purple Urchins Contorl vs Annual"
 author: "Russell Fager"
 date: "10/23/2021"
 output: html_document
 ---
+
+## Overview
+
+This code wrangles then visualizes data for purple urchins observed at the Naples site in 2010.
+
+Data Citation: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative. <https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b>.
 
 ```{r setup, include=TRUE, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -11,21 +17,28 @@ library(tidyverse)
 library(here)
 library(janitor)
 library(lubridate)
+library(kableExtra)
 
 ```
 
-### Read in the data
+## Read in the data
 
 read in the urchins.csv data
+
 ```{r}
 urchins_data <- read_csv(here("data", "urchins.csv"))
 ```
-### Clean names to lower snake case
+
+## Clean names to lower snake case
 
 ```{r}
 urchins_data_clean <- urchins_data %>%  clean_names()
 ```
-### Wrangle the urchins data to only include Naples Reef observations for purple urchins observed in 2010
+
+## Data Wrangling
+
+The below code wrangles the urchins data to only include Naples Reef observations for purple urchins in 2010
+
 ```{r}
 purple_urchins <- urchins_data_clean %>% 
   filter(common_name == "Purple Urchin", site == "NAPL") %>% 
@@ -33,53 +46,33 @@ purple_urchins <- urchins_data_clean %>%
   mutate(year = year(date_new)) %>% 
   filter(year == "2010")
 
-purple_urchins
 ```
-### Data Visualization 
+
+## Data Visualization
+
+The code below creates a histogram comparing the size of purple urchins in each treatment group (control vs. annual)
 
 ```{r}
 ggplot(data = purple_urchins, aes(x = size, color = treatment)) +
   geom_histogram() +
+  xlim(0, 10)+
   facet_wrap( ~ treatment)
  
 ```
+
+The code below creates a qqplot of purple urchin size from the Naples Reef observations in 2010
+
 ```{r}
 qqnorm(purple_urchins$size)
 qqline(purple_urchins$size)
 ```
 
-```{r}
-purple_urchins_control <- urchins_data_clean %>% 
-  filter(common_name == "Purple Urchin", site == "NAPL", treatment == "CONTROL") %>% 
-  mutate(date_new = mdy(date)) %>% 
-  mutate(year = year(date_new)) %>% 
-  filter(year == "2010")
-```
+The data points are close to the line indicating that the data has a close to normal distribution. This is also mirrored in the histogram which shows that the spread of purple urchin size in both treatments is very similar
 
-```{r}
-qqnorm(purple_urchins_control$size)
-qqline(purple_urchins_control$size)
-```
+## Descriptive Statistics Table
 
-```{r}
-purple_urchins_annual <- urchins_data_clean %>% 
-  filter(common_name == "Purple Urchin", site == "NAPL", treatment == "ANNUAL") %>% 
-  mutate(date_new = mdy(date)) %>% 
-  mutate(year = year(date_new)) %>% 
-  filter(year == "2010")
+Below is a basic summary table of descriptive statistics for both groups
 
-purple_urchins_annual
-```
-
-```{r}
-qqnorm(purple_urchins_annual$size)
-qqline(purple_urchins_annual$size)
-```
-The data points are close to the line indicating that data has a close to normal distribution.
-
-## Create a finalized basic summary table (with table caption above) of descriptive statistics for both groups (including at least the mean, standard deviation, and sample size by treatment). 
-
-    
 ```{r}
 purpl_urchin_stats <- purple_urchins %>% 
   group_by(treatment) %>% 
@@ -89,14 +82,14 @@ purpl_urchin_stats <- purple_urchins %>%
     sd = sd(size),
     median = median(size)) %>% 
 
-kable(caption = "Summary Statistics of Purple Urchins Size by Treatment", digits = 2, col.names = c("species",
+kable(caption = "Summary Statistics of Purple Urchin Size by Treatment", digits = 2, col.names = c("species",
                        "Sample Size",
                        "Mean Size (cm)",
                        "Standard Deviation (cm)",
                        "Median Size (cm)")) %>% 
   kable_styling(full_width = FALSE)
-
 purpl_urchin_stats
 
 ```
-    
+
+## End Task
