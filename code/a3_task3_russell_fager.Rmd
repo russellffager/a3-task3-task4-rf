@@ -123,12 +123,14 @@ The code below creates a chart showing the number of purple urchins recorded at 
 
 ```{r}
 ggplot(data = purple_urchins_summary, aes(x = year, y = urchin_count)) +
-  geom_col(aes(fill = site_full), width = 0.5)+
-  facet_wrap( ~ site_full) +
+  geom_col(aes(fill = site_full), 
+           width = 0.5,
+           position = "dodge")+
+  scale_fill_manual(values = c("darkseagreen2", "darkslategray2", "darkorange2", "cornsilk2", "yellow2"))+
   theme_bw ()+
   labs(x = "Year", 
        y = "Urchin Count",
-       title = "Urchin Count by Site and Year (FAGER)")
+       title = "Urchin Count by Site 2008-2020 (FAGER)")
 ```
 
 *Figure 3. This chart shows the number of purple urchins recorded at each site per year*
